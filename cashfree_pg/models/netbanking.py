@@ -20,18 +20,20 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr, conint, constr, validator
+from pydantic import field_validator, StringConstraints, ConfigDict, BaseModel, Field, StrictStr
+from typing_extensions import Annotated
 
 class Netbanking(BaseModel):
     """
     Netbanking payment method request body
     """
     channel: StrictStr = Field(..., description="The channel for netbanking will always be `link`")
-    netbanking_bank_code: Optional[conint(strict=True)] = Field(None, description="Bank code")
-    netbanking_bank_name: Optional[constr(strict=True)] = Field(None, description="String code for bank")
+    netbanking_bank_code: Optional[Annotated[int, Field(strict=True)]] = Field(None, description="Bank code")
+    netbanking_bank_name: Optional[Annotated[str, StringConstraints(strict=True)]] = Field(None, description="String code for bank")
     __properties = ["channel", "netbanking_bank_code", "netbanking_bank_name"]
 
-    @validator('netbanking_bank_name')
+    @field_validator('netbanking_bank_name')
+    @classmethod
     def netbanking_bank_name_validate_regular_expression(cls, value):
         """Validates the regular expression"""
         if value is None:
@@ -40,11 +42,7 @@ class Netbanking(BaseModel):
         if not re.match(r"^[A-Z]{5}$", value):
             raise ValueError(r"must validate the regular expression /^[A-Z]{5}$/")
         return value
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

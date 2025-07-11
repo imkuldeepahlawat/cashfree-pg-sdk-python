@@ -20,7 +20,7 @@ import json
 
 
 from typing import Any, Dict, Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
 
 class VendorSplit(BaseModel):
     """
@@ -31,11 +31,7 @@ class VendorSplit(BaseModel):
     percentage: Optional[Union[StrictFloat, StrictInt]] = Field(None, description="Percentage of order amount which shall get added to vendor account")
     tags: Optional[Dict[str, Dict[str, Any]]] = Field(None, description="Custom Tags in thr form of {\"key\":\"value\"} which can be passed for an order. A maximum of 10 tags can be added")
     __properties = ["vendor_id", "amount", "percentage", "tags"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, StrictInt, StrictStr
 
 class UploadTerminalDocsEntity(BaseModel):
     """
@@ -31,11 +31,7 @@ class UploadTerminalDocsEntity(BaseModel):
     doc_value: Optional[StrictStr] = None
     status: Optional[StrictStr] = None
     __properties = ["cf_terminal_id", "doc_type", "doc_value", "status"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

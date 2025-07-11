@@ -20,7 +20,8 @@ import json
 
 
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr
+from typing_extensions import Annotated
 
 class CreateSubscriptionRequestAuthorizationDetails(BaseModel):
     """
@@ -28,13 +29,9 @@ class CreateSubscriptionRequestAuthorizationDetails(BaseModel):
     """
     authorization_amount: Optional[Union[StrictFloat, StrictInt]] = Field(None, description="Authorization amount for the auth payment.")
     authorization_amount_refund: Optional[StrictBool] = Field(None, description="Indicates whether the authorization amount should be refunded to the customer automatically. Merchants can use this field to specify if the authorized funds should be returned to the customer after authorization of the subscription.")
-    payment_methods: Optional[conlist(StrictStr)] = Field(None, description="Payment methods for the subscription. enach, pnach, upi, card are possible values.")
+    payment_methods: Optional[Annotated[List[StrictStr], Field()]] = Field(None, description="Payment methods for the subscription. enach, pnach, upi, card are possible values.")
     __properties = ["authorization_amount", "authorization_amount_refund", "payment_methods"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

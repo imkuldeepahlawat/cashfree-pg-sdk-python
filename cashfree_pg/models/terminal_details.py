@@ -20,7 +20,8 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictStr
+from typing_extensions import Annotated
 
 class TerminalDetails(BaseModel):
     """
@@ -30,18 +31,14 @@ class TerminalDetails(BaseModel):
     cf_terminal_id: Optional[StrictStr] = Field(None, description="cashfree terminal id")
     last_updated_on: Optional[StrictStr] = Field(None, description="last instant when this terminal was updated")
     terminal_address: Optional[StrictStr] = Field(None, description="location of terminal")
-    terminal_id: Optional[constr(strict=True, max_length=100, min_length=3)] = Field(None, description="terminal id for merchant reference")
+    terminal_id: Optional[Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)]] = Field(None, description="terminal id for merchant reference")
     terminal_name: Optional[StrictStr] = Field(None, description="name of terminal/agent/storefront")
     terminal_note: Optional[StrictStr] = Field(None, description="note given by merchant while creating the terminal")
     terminal_phone_no: StrictStr = Field(..., description="mobile num of the terminal/agent/storefront,This is a required parameter when you do not provide the cf_terminal_id.")
     terminal_status: Optional[StrictStr] = Field(None, description="status of terminal active/inactive")
-    terminal_type: constr(strict=True, max_length=10, min_length=4) = Field(..., description="To identify the type of terminal product in use, in this case it is SPOS.")
+    terminal_type: Annotated[str, StringConstraints(strict=True, max_length=10, min_length=4)] = Field(..., description="To identify the type of terminal product in use, in this case it is SPOS.")
     __properties = ["added_on", "cf_terminal_id", "last_updated_on", "terminal_address", "terminal_id", "terminal_name", "terminal_note", "terminal_phone_no", "terminal_status", "terminal_type"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

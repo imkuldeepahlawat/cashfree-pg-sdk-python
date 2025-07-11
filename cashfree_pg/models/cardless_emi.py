@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictInt, StrictStr, validator
+from pydantic import field_validator, ConfigDict, BaseModel, Field, StrictInt, StrictStr
 
 class CardlessEMI(BaseModel):
     """
@@ -32,7 +32,8 @@ class CardlessEMI(BaseModel):
     emi_tenure: Optional[StrictInt] = Field(None, description="EMI tenure for the selected provider. This is mandatory when provider is one of [`hdfc`, `icici`, `cashe`, `idfc`, `kotak`]")
     __properties = ["channel", "provider", "phone", "emi_tenure"]
 
-    @validator('provider')
+    @field_validator('provider')
+    @classmethod
     def provider_validate_enum(cls, value):
         """Validates the enum"""
         if value is None:
@@ -41,11 +42,7 @@ class CardlessEMI(BaseModel):
         if value not in ('flexmoney', 'zestmoney', 'hdfc', 'icici', 'cashe', 'idfc', 'kotak', 'snapmint', 'bharatx'):
             raise ValueError("must be one of enum values ('flexmoney', 'zestmoney', 'hdfc', 'icici', 'cashe', 'idfc', 'kotak', 'snapmint', 'bharatx')")
         return value
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

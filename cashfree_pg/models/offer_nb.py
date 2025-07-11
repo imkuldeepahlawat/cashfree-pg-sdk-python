@@ -20,7 +20,7 @@ import json
 
 
 
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 from cashfree_pg.models.offer_nb_netbanking import OfferNBNetbanking
 
 class OfferNB(BaseModel):
@@ -29,11 +29,7 @@ class OfferNB(BaseModel):
     """
     netbanking: OfferNBNetbanking = Field(...)
     __properties = ["netbanking"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

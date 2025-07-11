@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictInt, StrictStr
 
 class ESOrderReconRequestPagination(BaseModel):
     """
@@ -29,11 +29,7 @@ class ESOrderReconRequestPagination(BaseModel):
     cursor: Optional[StrictStr] = None
     limit: Optional[StrictInt] = Field(None, description="Set the minimum/maximum limit for number of filtered data. Min value - 10, Max value - 100.")
     __properties = ["cursor", "limit"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

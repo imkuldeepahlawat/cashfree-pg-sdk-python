@@ -20,8 +20,9 @@ import json
 
 
 from typing import List, Optional, Union
-from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr, conlist
+from pydantic import Field, ConfigDict, BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.static_split_response_scheme_inner import StaticSplitResponseSchemeInner
+from typing_extensions import Annotated
 
 class StaticSplitResponse(BaseModel):
     """
@@ -31,14 +32,10 @@ class StaticSplitResponse(BaseModel):
     terminal_id: Optional[StrictStr] = None
     terminal_reference_id: Optional[Union[StrictFloat, StrictInt]] = None
     product_type: Optional[StrictStr] = None
-    scheme: Optional[conlist(StaticSplitResponseSchemeInner)] = None
+    scheme: Optional[Annotated[List[StaticSplitResponseSchemeInner], Field()]] = None
     added_on: Optional[StrictStr] = None
     __properties = ["active", "terminal_id", "terminal_reference_id", "product_type", "scheme", "added_on"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

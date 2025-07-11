@@ -20,7 +20,7 @@ import json
 
 
 
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 from cashfree_pg.models.offer_details import OfferDetails
 from cashfree_pg.models.offer_meta import OfferMeta
 from cashfree_pg.models.offer_tnc import OfferTnc
@@ -35,11 +35,7 @@ class CreateOfferRequest(BaseModel):
     offer_details: OfferDetails = Field(...)
     offer_validations: OfferValidations = Field(...)
     __properties = ["offer_meta", "offer_tnc", "offer_details", "offer_validations"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

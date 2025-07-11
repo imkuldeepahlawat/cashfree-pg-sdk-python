@@ -19,8 +19,8 @@ import json
 import pprint
 import re  # noqa: F401
 
-from typing import Any, List, Optional
-from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
+from typing import Literal, Any, List, Optional
+from pydantic import field_validator, ConfigDict, BaseModel, StrictStr, ValidationError
 from cashfree_pg.models.app_payment_method import AppPaymentMethod
 from cashfree_pg.models.banktransfer_payment_method import BanktransferPaymentMethod
 from cashfree_pg.models.card_emi_payment_method import CardEMIPaymentMethod
@@ -30,7 +30,7 @@ from cashfree_pg.models.net_banking_payment_method import NetBankingPaymentMetho
 from cashfree_pg.models.paylater_payment_method import PaylaterPaymentMethod
 from cashfree_pg.models.upi_payment_method import UPIPaymentMethod
 from typing import Union, Any, List, TYPE_CHECKING
-from pydantic import StrictStr, Field
+from pydantic import StrictStr
 
 PAYORDERREQUESTPAYMENTMETHOD_ONE_OF_SCHEMAS = ["AppPaymentMethod", "BanktransferPaymentMethod", "CardEMIPaymentMethod", "CardPaymentMethod", "CardlessEMIPaymentMethod", "NetBankingPaymentMethod", "PaylaterPaymentMethod", "UPIPaymentMethod"]
 
@@ -57,11 +57,9 @@ class PayOrderRequestPaymentMethod(BaseModel):
     if TYPE_CHECKING:
         actual_instance: Union[AppPaymentMethod, BanktransferPaymentMethod, CardEMIPaymentMethod, CardPaymentMethod, CardlessEMIPaymentMethod, NetBankingPaymentMethod, PaylaterPaymentMethod, UPIPaymentMethod]
     else:
-        actual_instance: Any
-    one_of_schemas: List[str] = Field(PAYORDERREQUESTPAYMENTMETHOD_ONE_OF_SCHEMAS, const=True)
-
-    class Config:
-        validate_assignment = True
+        actual_instance: Any = None
+    one_of_schemas: Literal[PAYORDERREQUESTPAYMENTMETHOD_ONE_OF_SCHEMAS] = PAYORDERREQUESTPAYMENTMETHOD_ONE_OF_SCHEMAS
+    model_config = ConfigDict(validate_assignment=True)
 
     def __init__(self, *args, **kwargs):
         if args:
@@ -73,7 +71,8 @@ class PayOrderRequestPaymentMethod(BaseModel):
         else:
             super().__init__(**kwargs)
 
-    @validator('actual_instance')
+    @field_validator('actual_instance')
+    @classmethod
     def actual_instance_must_validate_oneof(cls, v):
         instance = PayOrderRequestPaymentMethod.construct()
         error_messages = []

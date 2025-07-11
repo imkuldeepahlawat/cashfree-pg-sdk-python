@@ -20,20 +20,17 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, Field, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictStr
+from typing_extensions import Annotated
 
 class CreateSubscriptionRequestSubscriptionMeta(BaseModel):
     """
     CreateSubscriptionRequestSubscriptionMeta
     """
     return_url: Optional[StrictStr] = Field(None, description="The url to redirect after checkout.")
-    notification_channel: Optional[conlist(StrictStr)] = Field(None, description="Notification channel for the subscription. SMS, EMAIL are possible values.")
+    notification_channel: Optional[Annotated[List[StrictStr], Field()]] = Field(None, description="Notification channel for the subscription. SMS, EMAIL are possible values.")
     __properties = ["return_url", "notification_channel"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

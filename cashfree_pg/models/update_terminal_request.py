@@ -20,23 +20,20 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictStr
 from cashfree_pg.models.update_terminal_request_terminal_meta import UpdateTerminalRequestTerminalMeta
+from typing_extensions import Annotated
 
 class UpdateTerminalRequest(BaseModel):
     """
     Request body to update terminal details.
     """
     terminal_email: Optional[StrictStr] = Field(None, description="Mention the updated email ID of the terminal.")
-    terminal_phone_no: Optional[constr(strict=True, max_length=10, min_length=10)] = Field(None, description="Terminal phone number to be updated.")
+    terminal_phone_no: Optional[Annotated[str, StringConstraints(strict=True, max_length=10, min_length=10)]] = Field(None, description="Terminal phone number to be updated.")
     terminal_meta: Optional[UpdateTerminalRequestTerminalMeta] = None
     terminal_type: StrictStr = Field(..., description="Mention the terminal type to be updated. Possible values - AGENT, STOREFRONT.")
     __properties = ["terminal_email", "terminal_phone_no", "terminal_meta", "terminal_type"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

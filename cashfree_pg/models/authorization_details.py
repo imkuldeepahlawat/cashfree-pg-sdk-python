@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 
 class AuthorizationDetails(BaseModel):
     """
@@ -34,11 +34,7 @@ class AuthorizationDetails(BaseModel):
     payment_id: Optional[StrictStr] = Field(None, description="A unique ID passed by merchant for identifying the transaction.")
     payment_method: Optional[StrictStr] = Field(None, description="Payment method used for the authorization.")
     __properties = ["authorization_amount", "authorization_amount_refund", "authorization_reference", "authorization_time", "authorization_status", "payment_id", "payment_method"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

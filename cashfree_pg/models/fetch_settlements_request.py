@@ -20,7 +20,7 @@ import json
 
 
 
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 from cashfree_pg.models.fetch_settlements_request_filters import FetchSettlementsRequestFilters
 from cashfree_pg.models.fetch_settlements_request_pagination import FetchSettlementsRequestPagination
 
@@ -31,11 +31,7 @@ class FetchSettlementsRequest(BaseModel):
     pagination: FetchSettlementsRequestPagination = Field(...)
     filters: FetchSettlementsRequestFilters = Field(...)
     __properties = ["pagination", "filters"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

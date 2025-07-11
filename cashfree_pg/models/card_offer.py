@@ -20,21 +20,18 @@ import json
 
 
 from typing import List
-from pydantic import BaseModel, Field, StrictStr, conlist, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictStr
+from typing_extensions import Annotated
 
 class CardOffer(BaseModel):
     """
     CardOffer
     """
-    type: conlist(StrictStr) = Field(...)
-    bank_name: constr(strict=True, max_length=100, min_length=3) = Field(..., description="Bank Name of Card.")
-    scheme_name: conlist(StrictStr) = Field(...)
+    type: Annotated[List[StrictStr], Field()] = Field(...)
+    bank_name: Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)] = Field(..., description="Bank Name of Card.")
+    scheme_name: Annotated[List[StrictStr], Field()] = Field(...)
     __properties = ["type", "bank_name", "scheme_name"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

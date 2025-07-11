@@ -20,25 +20,22 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, Field, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictStr
 from cashfree_pg.models.eligibility_method_item_entity_details_available_handles_inner import EligibilityMethodItemEntityDetailsAvailableHandlesInner
 from cashfree_pg.models.subscription_bank_details import SubscriptionBankDetails
+from typing_extensions import Annotated
 
 class EligibilityMethodItemEntityDetails(BaseModel):
     """
     EligibilityMethodItemEntityDetails
     """
-    account_types: Optional[conlist(StrictStr)] = Field(None, description="List of account types associated with the payment method. (e.g. SAVINGS or CURRENT)")
-    frequent_bank_details: Optional[conlist(SubscriptionBankDetails)] = Field(None, description="List of the most frequently used banks.")
-    all_bank_details: Optional[conlist(SubscriptionBankDetails)] = Field(None, description="Details about all banks associated with the payment method.")
-    available_handles: Optional[conlist(EligibilityMethodItemEntityDetailsAvailableHandlesInner)] = Field(None, description="List of supported VPA handles.")
-    allowed_card_types: Optional[conlist(StrictStr)] = Field(None, description="List of allowed card types. (e.g. DEBIT_CARD, CREDIT_CARD)")
+    account_types: Optional[Annotated[List[StrictStr], Field()]] = Field(None, description="List of account types associated with the payment method. (e.g. SAVINGS or CURRENT)")
+    frequent_bank_details: Optional[Annotated[List[SubscriptionBankDetails], Field()]] = Field(None, description="List of the most frequently used banks.")
+    all_bank_details: Optional[Annotated[List[SubscriptionBankDetails], Field()]] = Field(None, description="Details about all banks associated with the payment method.")
+    available_handles: Optional[Annotated[List[EligibilityMethodItemEntityDetailsAvailableHandlesInner], Field()]] = Field(None, description="List of supported VPA handles.")
+    allowed_card_types: Optional[Annotated[List[StrictStr], Field()]] = Field(None, description="List of allowed card types. (e.g. DEBIT_CARD, CREDIT_CARD)")
     __properties = ["account_types", "frequent_bank_details", "all_bank_details", "available_handles", "allowed_card_types"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

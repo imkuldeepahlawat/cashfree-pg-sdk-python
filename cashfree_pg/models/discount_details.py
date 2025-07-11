@@ -20,28 +20,26 @@ import json
 
 
 from typing import Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, constr, validator
+from pydantic import field_validator, StringConstraints, ConfigDict, BaseModel, Field, StrictFloat, StrictInt
+from typing_extensions import Annotated
 
 class DiscountDetails(BaseModel):
     """
     detils of the discount object of offer
     """
-    discount_type: constr(strict=True, max_length=50, min_length=3) = Field(..., description="Type of discount")
+    discount_type: Annotated[str, StringConstraints(strict=True, max_length=50, min_length=3)] = Field(..., description="Type of discount")
     discount_value: Union[StrictFloat, StrictInt] = Field(..., description="Value of Discount.")
     max_discount_amount: Union[StrictFloat, StrictInt] = Field(..., description="Maximum Value of Discount allowed.")
     __properties = ["discount_type", "discount_value", "max_discount_amount"]
 
-    @validator('discount_type')
+    @field_validator('discount_type')
+    @classmethod
     def discount_type_validate_enum(cls, value):
         """Validates the enum"""
         if value not in ('flat', 'percentage'):
             raise ValueError("must be one of enum values ('flat', 'percentage')")
         return value
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

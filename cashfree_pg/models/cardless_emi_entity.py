@@ -20,21 +20,18 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, conlist, constr
+from pydantic import Field, StringConstraints, ConfigDict, BaseModel
 from cashfree_pg.models.emi_plans_array import EMIPlansArray
+from typing_extensions import Annotated
 
 class CardlessEMIEntity(BaseModel):
     """
     cardless EMI object
     """
-    payment_method: Optional[constr(strict=True, max_length=50, min_length=3)] = None
-    emi_plans: Optional[conlist(EMIPlansArray)] = None
+    payment_method: Optional[Annotated[str, StringConstraints(strict=True, max_length=50, min_length=3)]] = None
+    emi_plans: Optional[Annotated[List[EMIPlansArray], Field()]] = None
     __properties = ["payment_method", "emi_plans"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

@@ -20,27 +20,24 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field
 from cashfree_pg.models.create_terminal_request_terminal_meta import CreateTerminalRequestTerminalMeta
+from typing_extensions import Annotated
 
 class CreateTerminalRequest(BaseModel):
     """
     Request body to create a terminal
     """
-    terminal_id: constr(strict=True, max_length=100, min_length=3) = Field(..., description="merchant’s internal terminal id")
-    terminal_phone_no: constr(strict=True, max_length=10, min_length=10) = Field(..., description="phone number assigned to the terminal")
-    terminal_name: constr(strict=True, max_length=100, min_length=3) = Field(..., description="terminal name to be assigned by merchants")
-    terminal_address: Optional[constr(strict=True, max_length=100, min_length=1)] = Field(None, description="address of the terminal. required for STOREFRONT")
-    terminal_email: constr(strict=True, max_length=100, min_length=1) = Field(..., description="terminal email ID of the AGENT/STOREFRONT assigned by merchants.")
-    terminal_note: Optional[constr(strict=True, max_length=100, min_length=1)] = Field(None, description="additional note for terminal")
-    terminal_type: constr(strict=True, max_length=100, min_length=1) = Field(..., description="mention the terminal type. possible values - AGENT, STOREFRONT.")
+    terminal_id: Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)] = Field(..., description="merchant’s internal terminal id")
+    terminal_phone_no: Annotated[str, StringConstraints(strict=True, max_length=10, min_length=10)] = Field(..., description="phone number assigned to the terminal")
+    terminal_name: Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)] = Field(..., description="terminal name to be assigned by merchants")
+    terminal_address: Optional[Annotated[str, StringConstraints(strict=True, max_length=100, min_length=1)]] = Field(None, description="address of the terminal. required for STOREFRONT")
+    terminal_email: Annotated[str, StringConstraints(strict=True, max_length=100, min_length=1)] = Field(..., description="terminal email ID of the AGENT/STOREFRONT assigned by merchants.")
+    terminal_note: Optional[Annotated[str, StringConstraints(strict=True, max_length=100, min_length=1)]] = Field(None, description="additional note for terminal")
+    terminal_type: Annotated[str, StringConstraints(strict=True, max_length=100, min_length=1)] = Field(..., description="mention the terminal type. possible values - AGENT, STOREFRONT.")
     terminal_meta: Optional[CreateTerminalRequestTerminalMeta] = None
     __properties = ["terminal_id", "terminal_phone_no", "terminal_name", "terminal_address", "terminal_email", "terminal_note", "terminal_type", "terminal_meta"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

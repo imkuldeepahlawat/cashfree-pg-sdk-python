@@ -20,7 +20,7 @@ import json
 
 
 
-from pydantic import BaseModel, Field, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictStr
 
 class DemapSoundboxVpaRequest(BaseModel):
     """
@@ -29,11 +29,7 @@ class DemapSoundboxVpaRequest(BaseModel):
     cf_terminal_id: StrictStr = Field(..., description="cashfree terminal id.")
     device_serial_no: StrictStr = Field(..., description="Device Serial No of soundbox that need to demap.")
     __properties = ["cf_terminal_id", "device_serial_no"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

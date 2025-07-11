@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictStr
 
 class LinkMetaResponseEntity(BaseModel):
     """
@@ -31,11 +31,7 @@ class LinkMetaResponseEntity(BaseModel):
     return_url: Optional[StrictStr] = Field(None, description="The URL to which user will be redirected to after the payment is done on the link. Maximum length: 250.")
     payment_methods: Optional[StrictStr] = Field(None, description="Allowed payment modes for this link. Pass comma-separated values among following options - \"cc\", \"dc\", \"ccc\", \"ppc\", \"nb\", \"upi\", \"paypal\", \"app\". Leave it blank to show all available payment methods")
     __properties = ["notify_url", "upi_intent", "return_url", "payment_methods"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

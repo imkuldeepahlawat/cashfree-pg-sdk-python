@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 from cashfree_pg.models.payment_method_bank_transfer_in_payments_entity_banktransfer import PaymentMethodBankTransferInPaymentsEntityBanktransfer
 
 class PaymentMethodBankTransferInPaymentsEntity(BaseModel):
@@ -29,11 +29,7 @@ class PaymentMethodBankTransferInPaymentsEntity(BaseModel):
     """
     banktransfer: Optional[PaymentMethodBankTransferInPaymentsEntityBanktransfer] = None
     __properties = ["banktransfer"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

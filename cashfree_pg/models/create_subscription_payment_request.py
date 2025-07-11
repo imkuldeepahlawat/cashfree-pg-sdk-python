@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.create_subscription_payment_request_payment_method import CreateSubscriptionPaymentRequestPaymentMethod
 
 class CreateSubscriptionPaymentRequest(BaseModel):
@@ -36,11 +36,7 @@ class CreateSubscriptionPaymentRequest(BaseModel):
     payment_type: StrictStr = Field(..., description="Payment type. Can be AUTH or CHARGE.")
     payment_method: Optional[CreateSubscriptionPaymentRequestPaymentMethod] = None
     __properties = ["subscription_id", "subscription_session_id", "payment_id", "payment_amount", "payment_schedule_date", "payment_remarks", "payment_type", "payment_method"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

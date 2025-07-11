@@ -20,20 +20,17 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, conlist
+from pydantic import Field, ConfigDict, BaseModel
 from cashfree_pg.models.payment_mode_details import PaymentModeDetails
+from typing_extensions import Annotated
 
 class EligibilityPaymentMethodsEntityEntityDetails(BaseModel):
     """
     EligibilityPaymentMethodsEntityEntityDetails
     """
-    payment_method_details: Optional[conlist(PaymentModeDetails)] = None
+    payment_method_details: Optional[Annotated[List[PaymentModeDetails], Field()]] = None
     __properties = ["payment_method_details"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

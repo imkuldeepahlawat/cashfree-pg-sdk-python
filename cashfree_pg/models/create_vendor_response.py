@@ -20,10 +20,11 @@ import json
 
 
 from typing import List, Optional, Union
-from pydantic import BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr, conlist
+from pydantic import Field, ConfigDict, BaseModel, StrictBool, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.bank_details import BankDetails
 from cashfree_pg.models.kyc_details import KycDetails
 from cashfree_pg.models.schedule_option import ScheduleOption
+from typing_extensions import Annotated
 
 class CreateVendorResponse(BaseModel):
     """
@@ -31,21 +32,17 @@ class CreateVendorResponse(BaseModel):
     """
     email: Optional[StrictStr] = None
     status: Optional[StrictStr] = None
-    bank: Optional[conlist(BankDetails)] = None
+    bank: Optional[Annotated[List[BankDetails], Field()]] = None
     upi: Optional[StrictStr] = None
     phone: Optional[Union[StrictFloat, StrictInt]] = None
     name: Optional[StrictStr] = None
     vendor_id: Optional[StrictStr] = None
-    schedule_option: Optional[conlist(ScheduleOption)] = None
-    kyc_details: Optional[conlist(KycDetails)] = None
+    schedule_option: Optional[Annotated[List[ScheduleOption], Field()]] = None
+    kyc_details: Optional[Annotated[List[KycDetails], Field()]] = None
     dashboard_access: Optional[StrictBool] = None
     bank_details: Optional[StrictStr] = None
     __properties = ["email", "status", "bank", "upi", "phone", "name", "vendor_id", "schedule_option", "kyc_details", "dashboard_access", "bank_details"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

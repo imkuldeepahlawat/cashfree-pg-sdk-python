@@ -20,23 +20,20 @@ import json
 
 
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field, conlist
+from pydantic import ConfigDict, BaseModel, Field
 from cashfree_pg.models.split_order_recon_success_response_settlement import SplitOrderReconSuccessResponseSettlement
 from cashfree_pg.models.split_order_recon_success_response_vendors_inner import SplitOrderReconSuccessResponseVendorsInner
+from typing_extensions import Annotated
 
 class SplitOrderReconSuccessResponse(BaseModel):
     """
     Split Order Reconciliation Request Body
     """
     settlement: Optional[SplitOrderReconSuccessResponseSettlement] = None
-    refunds: Optional[conlist(Dict[str, Any])] = Field(None, description="List of refunds associated with the order, if any.")
-    vendors: Optional[conlist(SplitOrderReconSuccessResponseVendorsInner)] = Field(None, description="List of vendor settlements associated with the split settlement.")
+    refunds: Optional[Annotated[List[Dict[str, Any]], Field()]] = Field(None, description="List of refunds associated with the order, if any.")
+    vendors: Optional[Annotated[List[SplitOrderReconSuccessResponseVendorsInner], Field()]] = Field(None, description="List of vendor settlements associated with the split settlement.")
     __properties = ["settlement", "refunds", "vendors"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

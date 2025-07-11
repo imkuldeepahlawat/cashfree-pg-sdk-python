@@ -20,7 +20,7 @@ import json
 
 
 from typing import Any, Dict, Optional
-from pydantic import BaseModel, StrictStr
+from pydantic import ConfigDict, BaseModel, StrictStr
 
 class OrderPayData(BaseModel):
     """
@@ -31,11 +31,7 @@ class OrderPayData(BaseModel):
     content_type: Optional[StrictStr] = None
     method: Optional[StrictStr] = None
     __properties = ["url", "payload", "content_type", "method"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

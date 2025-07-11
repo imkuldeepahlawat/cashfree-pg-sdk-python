@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictBool
+from pydantic import ConfigDict, BaseModel, Field, StrictBool
 
 class LinkNotifyEntity(BaseModel):
     """
@@ -29,11 +29,7 @@ class LinkNotifyEntity(BaseModel):
     send_sms: Optional[StrictBool] = Field(None, description="If \"true\", Cashfree will send sms on customer_phone")
     send_email: Optional[StrictBool] = Field(None, description="If \"true\", Cashfree will send email on customer_email")
     __properties = ["send_sms", "send_email"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

@@ -20,7 +20,8 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, StrictFloat, StrictInt, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, StrictFloat, StrictInt
+from typing_extensions import Annotated
 
 class EMIPlansArray(BaseModel):
     """
@@ -28,16 +29,12 @@ class EMIPlansArray(BaseModel):
     """
     tenure: Optional[StrictInt] = None
     interest_rate: Optional[Union[StrictFloat, StrictInt]] = None
-    currency: Optional[constr(strict=True, max_length=50, min_length=3)] = None
+    currency: Optional[Annotated[str, StringConstraints(strict=True, max_length=50, min_length=3)]] = None
     emi: Optional[StrictInt] = None
     total_interest: Optional[StrictInt] = None
     total_amount: Optional[StrictInt] = None
     __properties = ["tenure", "interest_rate", "currency", "emi", "total_interest", "total_amount"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

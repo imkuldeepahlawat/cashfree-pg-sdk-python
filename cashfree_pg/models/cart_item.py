@@ -20,7 +20,8 @@ import json
 
 
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from typing_extensions import Annotated
 
 class CartItem(BaseModel):
     """
@@ -29,7 +30,7 @@ class CartItem(BaseModel):
     item_id: Optional[StrictStr] = Field(None, description="Unique identifier of the item")
     item_name: Optional[StrictStr] = Field(None, description="Name of the item")
     item_description: Optional[StrictStr] = Field(None, description="Description of the item")
-    item_tags: Optional[conlist(StrictStr)] = Field(None, description="Tags attached to that item")
+    item_tags: Optional[Annotated[List[StrictStr], Field()]] = Field(None, description="Tags attached to that item")
     item_details_url: Optional[StrictStr] = Field(None, description="Item details url")
     item_image_url: Optional[StrictStr] = Field(None, description="Item image url")
     item_original_unit_price: Optional[Union[StrictFloat, StrictInt]] = Field(None, description="Original price")
@@ -37,11 +38,7 @@ class CartItem(BaseModel):
     item_currency: Optional[StrictStr] = Field(None, description="Currency of the item.")
     item_quantity: Optional[Union[StrictFloat, StrictInt]] = Field(None, description="Quantity if that item")
     __properties = ["item_id", "item_name", "item_description", "item_tags", "item_details_url", "item_image_url", "item_original_unit_price", "item_discounted_unit_price", "item_currency", "item_quantity"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

@@ -20,20 +20,17 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, Field, confloat, conint, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field
+from typing_extensions import Annotated
 
 class OfferQueries(BaseModel):
     """
     Offer Query Object
     """
-    order_id: Optional[constr(strict=True, max_length=50, min_length=3)] = Field(None, description="OrderId of the order. Either of `order_id` or `order_amount` is mandatory.")
-    amount: Optional[Union[confloat(ge=1, strict=True), conint(ge=1, strict=True)]] = Field(None, description="Amount of the order. OrderId of the order. Either of `order_id` or `order_amount` is mandatory.")
+    order_id: Optional[Annotated[str, StringConstraints(strict=True, max_length=50, min_length=3)]] = Field(None, description="OrderId of the order. Either of `order_id` or `order_amount` is mandatory.")
+    amount: Optional[Union[Annotated[float, Field(ge=1, strict=True)], Annotated[int, Field(ge=1, strict=True)]]] = Field(None, description="Amount of the order. OrderId of the order. Either of `order_id` or `order_amount` is mandatory.")
     __properties = ["order_id", "amount"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

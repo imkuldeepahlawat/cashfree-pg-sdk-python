@@ -20,7 +20,8 @@ import json
 
 
 from typing import Dict, Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from typing_extensions import Annotated
 
 class PaymentWebhookOrderEntity(BaseModel):
     """
@@ -29,13 +30,9 @@ class PaymentWebhookOrderEntity(BaseModel):
     order_id: Optional[StrictStr] = None
     order_amount: Optional[Union[StrictFloat, StrictInt]] = None
     order_currency: Optional[StrictStr] = None
-    order_tags: Optional[Dict[str, constr(strict=True, max_length=255, min_length=1)]] = Field(None, description="Custom Tags in thr form of {\"key\":\"value\"} which can be passed for an order. A maximum of 10 tags can be added")
+    order_tags: Optional[Dict[str, Annotated[str, StringConstraints(strict=True, max_length=255, min_length=1)]]] = Field(None, description="Custom Tags in thr form of {\"key\":\"value\"} which can be passed for an order. A maximum of 10 tags can be added")
     __properties = ["order_id", "order_amount", "order_currency", "order_tags"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

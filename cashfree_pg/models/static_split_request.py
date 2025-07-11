@@ -20,8 +20,9 @@ import json
 
 
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.static_split_request_scheme_inner import StaticSplitRequestSchemeInner
+from typing_extensions import Annotated
 
 class StaticSplitRequest(BaseModel):
     """
@@ -31,13 +32,9 @@ class StaticSplitRequest(BaseModel):
     terminal_id: Optional[StrictStr] = Field(None, description="For Subscription payments, the subscription reference ID is to be shared as the terminal ID. Incase for Payment Gateway terminal ID is non-mandatory. Mention as 0 if not applicable.")
     terminal_reference_id: Optional[Union[StrictFloat, StrictInt]] = Field(None, description="You can share additional information using the reference ID.")
     product_type: StrictStr = Field(..., description="Specify the product for which the split should be created. If you want split to be created for Payment Gateway pass value as \"PG\". If you want split to be created for Subscription, pass value as \"SBC\". Accepted values - \"STATIC_QR\", \"SBC\", \"PG\", \"EPOS\".")
-    scheme: conlist(StaticSplitRequestSchemeInner) = Field(..., description="Provide the split scheme details.")
+    scheme: Annotated[List[StaticSplitRequestSchemeInner], Field()] = Field(..., description="Provide the split scheme details.")
     __properties = ["active", "terminal_id", "terminal_reference_id", "product_type", "scheme"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

@@ -20,19 +20,16 @@ import json
 
 
 
-from pydantic import BaseModel, Field, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field
+from typing_extensions import Annotated
 
 class CustomerDetailsCardlessEMI(BaseModel):
     """
     Details of the customer for whom eligibility is being checked.
     """
-    customer_phone: constr(strict=True, max_length=50, min_length=3) = Field(..., description="Phone Number of the customer")
+    customer_phone: Annotated[str, StringConstraints(strict=True, max_length=50, min_length=3)] = Field(..., description="Phone Number of the customer")
     __properties = ["customer_phone"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

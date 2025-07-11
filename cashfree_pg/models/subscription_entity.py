@@ -20,12 +20,13 @@ import json
 
 
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictStr
 from cashfree_pg.models.authorization_details import AuthorizationDetails
 from cashfree_pg.models.plan_entity import PlanEntity
 from cashfree_pg.models.subscription_customer_details import SubscriptionCustomerDetails
 from cashfree_pg.models.subscription_entity_subscription_meta import SubscriptionEntitySubscriptionMeta
 from cashfree_pg.models.subscription_payment_split_item import SubscriptionPaymentSplitItem
+from typing_extensions import Annotated
 
 class SubscriptionEntity(BaseModel):
     """
@@ -41,15 +42,11 @@ class SubscriptionEntity(BaseModel):
     subscription_meta: Optional[SubscriptionEntitySubscriptionMeta] = None
     subscription_note: Optional[StrictStr] = Field(None, description="Note for the subscription.")
     subscription_session_id: Optional[StrictStr] = Field(None, description="Subscription Session Id.")
-    subscription_payment_splits: Optional[conlist(SubscriptionPaymentSplitItem)] = Field(None, description="Payment splits for the subscription.")
+    subscription_payment_splits: Optional[Annotated[List[SubscriptionPaymentSplitItem], Field()]] = Field(None, description="Payment splits for the subscription.")
     subscription_status: Optional[StrictStr] = Field(None, description="Status of the subscription.")
     subscription_tags: Optional[Dict[str, Any]] = Field(None, description="Tags for the subscription.")
     __properties = ["authorisation_details", "cf_subscription_id", "customer_details", "plan_details", "subscription_expiry_time", "subscription_first_charge_time", "subscription_id", "subscription_meta", "subscription_note", "subscription_session_id", "subscription_payment_splits", "subscription_status", "subscription_tags"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

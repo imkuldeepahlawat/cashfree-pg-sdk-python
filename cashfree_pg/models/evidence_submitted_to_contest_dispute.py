@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictInt, StrictStr
 
 class EvidenceSubmittedToContestDispute(BaseModel):
     """
@@ -31,11 +31,7 @@ class EvidenceSubmittedToContestDispute(BaseModel):
     document_type: Optional[StrictStr] = Field(None, alias="documentType")
     download_url: Optional[StrictStr] = Field(None, alias="downloadUrl")
     __properties = ["documentId", "documentName", "documentType", "downloadUrl"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

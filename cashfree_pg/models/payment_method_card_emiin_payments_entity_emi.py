@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, StrictFloat, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.payment_method_card_emiin_payments_entity_emi_emi_details import PaymentMethodCardEMIInPaymentsEntityEmiEmiDetails
 
 class PaymentMethodCardEMIInPaymentsEntityEmi(BaseModel):
@@ -37,11 +37,7 @@ class PaymentMethodCardEMIInPaymentsEntityEmi(BaseModel):
     emi_tenure: Optional[Union[StrictFloat, StrictInt]] = None
     emi_details: Optional[PaymentMethodCardEMIInPaymentsEntityEmiEmiDetails] = None
     __properties = ["channel", "card_number", "card_network", "card_type", "card_country", "card_bank_name", "card_network_reference_id", "emi_tenure", "emi_details"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

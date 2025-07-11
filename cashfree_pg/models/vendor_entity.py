@@ -20,10 +20,11 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, StrictStr, conlist
+from pydantic import Field, ConfigDict, BaseModel, StrictStr
 from cashfree_pg.models.bank_details import BankDetails
 from cashfree_pg.models.schedule_option import ScheduleOption
 from cashfree_pg.models.vendor_entity_related_docs_inner import VendorEntityRelatedDocsInner
+from typing_extensions import Annotated
 
 class VendorEntity(BaseModel):
     """
@@ -36,20 +37,16 @@ class VendorEntity(BaseModel):
     vendor_id: Optional[StrictStr] = None
     added_on: Optional[StrictStr] = None
     updated_on: Optional[StrictStr] = None
-    bank: Optional[conlist(BankDetails)] = None
+    bank: Optional[Annotated[List[BankDetails], Field()]] = None
     upi: Optional[StrictStr] = None
-    schedule_option: Optional[conlist(ScheduleOption)] = None
+    schedule_option: Optional[Annotated[List[ScheduleOption], Field()]] = None
     vendor_type: Optional[StrictStr] = None
     account_type: Optional[StrictStr] = None
     business_type: Optional[StrictStr] = None
     remarks: Optional[StrictStr] = None
-    related_docs: Optional[conlist(VendorEntityRelatedDocsInner)] = None
+    related_docs: Optional[Annotated[List[VendorEntityRelatedDocsInner], Field()]] = None
     __properties = ["email", "status", "phone", "name", "vendor_id", "added_on", "updated_on", "bank", "upi", "schedule_option", "vendor_type", "account_type", "business_type", "remarks", "related_docs"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

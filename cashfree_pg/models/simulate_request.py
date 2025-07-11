@@ -20,7 +20,7 @@ import json
 
 
 
-from pydantic import BaseModel, Field, StrictStr, validator
+from pydantic import field_validator, ConfigDict, BaseModel, Field, StrictStr
 from cashfree_pg.models.entity_simulation_request import EntitySimulationRequest
 
 class SimulateRequest(BaseModel):
@@ -32,17 +32,14 @@ class SimulateRequest(BaseModel):
     entity_simulation: EntitySimulationRequest = Field(...)
     __properties = ["entity", "entity_id", "entity_simulation"]
 
-    @validator('entity')
+    @field_validator('entity')
+    @classmethod
     def entity_validate_enum(cls, value):
         """Validates the enum"""
         if value not in ('PAYMENTS', 'SUBS_PAYMENTS'):
             raise ValueError("must be one of enum values ('PAYMENTS', 'SUBS_PAYMENTS')")
         return value
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

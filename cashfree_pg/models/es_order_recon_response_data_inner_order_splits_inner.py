@@ -20,21 +20,18 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, StrictStr, conlist
+from pydantic import Field, ConfigDict, BaseModel, StrictStr
 from cashfree_pg.models.es_order_recon_response_data_inner_order_splits_inner_split_inner import ESOrderReconResponseDataInnerOrderSplitsInnerSplitInner
+from typing_extensions import Annotated
 
 class ESOrderReconResponseDataInnerOrderSplitsInner(BaseModel):
     """
     ESOrderReconResponseDataInnerOrderSplitsInner
     """
-    split: Optional[conlist(ESOrderReconResponseDataInnerOrderSplitsInnerSplitInner)] = None
+    split: Optional[Annotated[List[ESOrderReconResponseDataInnerOrderSplitsInnerSplitInner], Field()]] = None
     created_at: Optional[StrictStr] = None
     __properties = ["split", "created_at"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

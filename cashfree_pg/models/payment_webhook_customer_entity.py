@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, StrictStr
+from pydantic import ConfigDict, BaseModel, StrictStr
 
 class PaymentWebhookCustomerEntity(BaseModel):
     """
@@ -31,11 +31,7 @@ class PaymentWebhookCustomerEntity(BaseModel):
     customer_email: Optional[StrictStr] = None
     customer_phone: Optional[StrictStr] = None
     __properties = ["customer_name", "customer_id", "customer_email", "customer_phone"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

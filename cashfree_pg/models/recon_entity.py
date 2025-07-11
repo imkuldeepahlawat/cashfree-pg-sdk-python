@@ -20,8 +20,9 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, Field, StrictInt, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictInt, StrictStr
 from cashfree_pg.models.recon_entity_data_inner import ReconEntityDataInner
+from typing_extensions import Annotated
 
 class ReconEntity(BaseModel):
     """
@@ -29,13 +30,9 @@ class ReconEntity(BaseModel):
     """
     cursor: Optional[StrictStr] = Field(None, description="Specifies from where the next set of settlement details should be fetched.")
     limit: Optional[StrictInt] = Field(None, description="Number of settlements you want to fetch in the next iteration.")
-    data: Optional[conlist(ReconEntityDataInner)] = None
+    data: Optional[Annotated[List[ReconEntityDataInner], Field()]] = None
     __properties = ["cursor", "limit", "data"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

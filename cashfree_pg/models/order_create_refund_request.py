@@ -20,21 +20,23 @@ import json
 
 
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, conlist, constr, validator
+from pydantic import field_validator, StringConstraints, ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.vendor_split import VendorSplit
+from typing_extensions import Annotated
 
 class OrderCreateRefundRequest(BaseModel):
     """
     create refund request object
     """
     refund_amount: Union[StrictFloat, StrictInt] = Field(..., description="Amount to be refunded. Should be lesser than or equal to the transaction amount. (Decimals allowed)")
-    refund_id: constr(strict=True, max_length=40, min_length=3) = Field(..., description="An unique ID to associate the refund with. Provie alphanumeric values")
-    refund_note: Optional[constr(strict=True, max_length=100, min_length=3)] = Field(None, description="A refund note for your reference.")
+    refund_id: Annotated[str, StringConstraints(strict=True, max_length=40, min_length=3)] = Field(..., description="An unique ID to associate the refund with. Provie alphanumeric values")
+    refund_note: Optional[Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)]] = Field(None, description="A refund note for your reference.")
     refund_speed: Optional[StrictStr] = Field(None, description="Speed at which the refund is processed. It's an optional field with default being STANDARD")
-    refund_splits: Optional[conlist(VendorSplit)] = None
+    refund_splits: Optional[Annotated[List[VendorSplit], Field()]] = None
     __properties = ["refund_amount", "refund_id", "refund_note", "refund_speed", "refund_splits"]
 
-    @validator('refund_speed')
+    @field_validator('refund_speed')
+    @classmethod
     def refund_speed_validate_enum(cls, value):
         """Validates the enum"""
         if value is None:
@@ -43,11 +45,7 @@ class OrderCreateRefundRequest(BaseModel):
         if value not in ('STANDARD', 'INSTANT'):
             raise ValueError("must be one of enum values ('STANDARD', 'INSTANT')")
         return value
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

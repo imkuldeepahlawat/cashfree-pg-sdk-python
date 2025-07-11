@@ -20,26 +20,23 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from typing_extensions import Annotated
 
 class CustomerDetailsResponse(BaseModel):
     """
     The customer details that are necessary. Note that you can pass dummy details if your use case does not require the customer details.
     """
-    customer_id: Optional[constr(strict=True, max_length=50, min_length=3)] = Field(None, description="A unique identifier for the customer. Use alphanumeric values only.")
-    customer_email: Optional[constr(strict=True, max_length=100, min_length=3)] = Field(None, description="Customer email address.")
-    customer_phone: Optional[constr(strict=True, max_length=10, min_length=10)] = Field(None, description="Customer phone number.")
-    customer_name: Optional[constr(strict=True, max_length=100, min_length=3)] = Field(None, description="Name of the customer.")
-    customer_bank_account_number: Optional[constr(strict=True, max_length=20, min_length=3)] = Field(None, description="Customer bank account. Required if you want to do a bank account check (TPV)")
+    customer_id: Optional[Annotated[str, StringConstraints(strict=True, max_length=50, min_length=3)]] = Field(None, description="A unique identifier for the customer. Use alphanumeric values only.")
+    customer_email: Optional[Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)]] = Field(None, description="Customer email address.")
+    customer_phone: Optional[Annotated[str, StringConstraints(strict=True, max_length=10, min_length=10)]] = Field(None, description="Customer phone number.")
+    customer_name: Optional[Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)]] = Field(None, description="Name of the customer.")
+    customer_bank_account_number: Optional[Annotated[str, StringConstraints(strict=True, max_length=20, min_length=3)]] = Field(None, description="Customer bank account. Required if you want to do a bank account check (TPV)")
     customer_bank_ifsc: Optional[StrictStr] = Field(None, description="Customer bank IFSC. Required if you want to do a bank account check (TPV)")
     customer_bank_code: Optional[Union[StrictFloat, StrictInt]] = Field(None, description="Customer bank code. Required for net banking payments, if you want to do a bank account check (TPV)")
     customer_uid: Optional[StrictStr] = Field(None, description="Customer identifier at Cashfree. You will get this when you create/get customer")
     __properties = ["customer_id", "customer_email", "customer_phone", "customer_name", "customer_bank_account_number", "customer_bank_ifsc", "customer_bank_code", "customer_uid"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

@@ -20,7 +20,8 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, Field, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictStr
+from typing_extensions import Annotated
 
 class SubscriptionBankDetails(BaseModel):
     """
@@ -28,13 +29,9 @@ class SubscriptionBankDetails(BaseModel):
     """
     bank_id: Optional[StrictStr] = Field(None, description="ID of the bank.")
     bank_name: Optional[StrictStr] = Field(None, description="Name of the bank.")
-    account_auth_modes: Optional[conlist(StrictStr)] = Field(None, description="List of account authentication modes supported by the bank. (e.g. DEBIT_CARD, NET_BANKING, AADHAAR)")
+    account_auth_modes: Optional[Annotated[List[StrictStr], Field()]] = Field(None, description="List of account authentication modes supported by the bank. (e.g. DEBIT_CARD, NET_BANKING, AADHAAR)")
     __properties = ["bank_id", "bank_name", "account_auth_modes"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

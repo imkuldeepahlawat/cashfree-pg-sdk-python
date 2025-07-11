@@ -20,14 +20,15 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from typing_extensions import Annotated
 
 class CreatePlanRequest(BaseModel):
     """
     Request body to create a plan.
     """
-    plan_id: constr(strict=True, max_length=40, min_length=1) = Field(..., description="Unique ID to identify the plan. Only alpha-numerics, dot, hyphen and underscore allowed.")
-    plan_name: constr(strict=True, max_length=40, min_length=1) = Field(..., description="Name of the plan.")
+    plan_id: Annotated[str, StringConstraints(strict=True, max_length=40, min_length=1)] = Field(..., description="Unique ID to identify the plan. Only alpha-numerics, dot, hyphen and underscore allowed.")
+    plan_name: Annotated[str, StringConstraints(strict=True, max_length=40, min_length=1)] = Field(..., description="Name of the plan.")
     plan_type: StrictStr = Field(..., description="Type of the plan. Possible values - PERIODIC, ON_DEMAND.")
     plan_currency: Optional[StrictStr] = Field(None, description="Currency of the plan.")
     plan_recurring_amount: Optional[Union[StrictFloat, StrictInt]] = Field(None, description="Recurring amount for the plan. Required for PERIODIC plan_type.")
@@ -37,11 +38,7 @@ class CreatePlanRequest(BaseModel):
     plan_interval_type: Optional[StrictStr] = Field(None, description="Interval type for the plan. Possible values - DAY, WEEK, MONTH, YEAR.")
     plan_note: Optional[StrictStr] = Field(None, description="Note for the plan.")
     __properties = ["plan_id", "plan_name", "plan_type", "plan_currency", "plan_recurring_amount", "plan_max_amount", "plan_max_cycles", "plan_intervals", "plan_interval_type", "plan_note"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

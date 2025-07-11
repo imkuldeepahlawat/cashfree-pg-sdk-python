@@ -20,21 +20,18 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictStr
+from typing_extensions import Annotated
 
 class CreateCustomerRequest(BaseModel):
     """
     Request body to create a customer at cashfree
     """
-    customer_phone: constr(strict=True, max_length=10, min_length=10) = Field(..., description="Customer Phone Number")
+    customer_phone: Annotated[str, StringConstraints(strict=True, max_length=10, min_length=10)] = Field(..., description="Customer Phone Number")
     customer_email: Optional[StrictStr] = Field(None, description="Customer Email")
     customer_name: Optional[StrictStr] = Field(None, description="Customer Name")
     __properties = ["customer_phone", "customer_email", "customer_name"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

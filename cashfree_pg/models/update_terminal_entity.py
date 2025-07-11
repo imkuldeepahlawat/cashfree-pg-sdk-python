@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, StrictInt, StrictStr
 from cashfree_pg.models.create_terminal_request_terminal_meta import CreateTerminalRequestTerminalMeta
 
 class UpdateTerminalEntity(BaseModel):
@@ -40,11 +40,7 @@ class UpdateTerminalEntity(BaseModel):
     terminal_status: Optional[StrictStr] = None
     terminal_meta: Optional[CreateTerminalRequestTerminalMeta] = None
     __properties = ["added_on", "cf_terminal_id", "last_updated_on", "terminal_address", "terminal_email", "terminal_type", "teminal_id", "terminal_name", "terminal_note", "terminal_phone_no", "terminal_status", "terminal_meta"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

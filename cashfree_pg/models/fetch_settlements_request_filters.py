@@ -20,22 +20,19 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, Field, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictStr
+from typing_extensions import Annotated
 
 class FetchSettlementsRequestFilters(BaseModel):
     """
     Specify either the Settlement ID, Settlement UTR, or start date and end date to fetch the settlement details.
     """
-    cf_settlement_ids: Optional[conlist(StrictStr)] = Field(None, description="List of settlement IDs for which you want the settlement reconciliation details.")
-    settlement_utrs: Optional[conlist(StrictStr)] = Field(None, description="List of settlement UTRs for which you want the settlement reconciliation details.")
+    cf_settlement_ids: Optional[Annotated[List[StrictStr], Field()]] = Field(None, description="List of settlement IDs for which you want the settlement reconciliation details.")
+    settlement_utrs: Optional[Annotated[List[StrictStr], Field()]] = Field(None, description="List of settlement UTRs for which you want the settlement reconciliation details.")
     start_date: Optional[StrictStr] = Field(None, description="Specify the start date from when you want the settlement reconciliation details.")
     end_date: Optional[StrictStr] = Field(None, description="Specify the end date till when you want the settlement reconciliation details.")
     __properties = ["cf_settlement_ids", "settlement_utrs", "start_date", "end_date"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

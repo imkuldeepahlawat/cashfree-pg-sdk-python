@@ -20,8 +20,9 @@ import json
 
 
 from typing import List, Optional, Union
-from pydantic import BaseModel, StrictFloat, StrictInt, StrictStr, conlist
+from pydantic import Field, ConfigDict, BaseModel, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.transfer_details_tags_inner import TransferDetailsTagsInner
+from typing_extensions import Annotated
 
 class TransferDetails(BaseModel):
     """
@@ -32,13 +33,9 @@ class TransferDetails(BaseModel):
     transfer_type: Optional[StrictStr] = None
     transfer_amount: Optional[Union[StrictFloat, StrictInt]] = None
     remark: Optional[StrictStr] = None
-    tags: Optional[conlist(TransferDetailsTagsInner)] = None
+    tags: Optional[Annotated[List[TransferDetailsTagsInner], Field()]] = None
     __properties = ["vendor_id", "transfer_from", "transfer_type", "transfer_amount", "remark", "tags"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

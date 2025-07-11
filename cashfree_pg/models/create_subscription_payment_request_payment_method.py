@@ -19,14 +19,14 @@ import json
 import pprint
 import re  # noqa: F401
 
-from typing import Any, List, Optional
-from pydantic import BaseModel, Field, StrictStr, ValidationError, validator
+from typing import Literal, Any, List, Optional
+from pydantic import field_validator, ConfigDict, BaseModel, StrictStr, ValidationError
 from cashfree_pg.models.create_subscription_payment_request_card import CreateSubscriptionPaymentRequestCard
 from cashfree_pg.models.create_subscription_payment_request_enack import CreateSubscriptionPaymentRequestEnack
 from cashfree_pg.models.create_subscription_payment_request_pnach import CreateSubscriptionPaymentRequestPnach
 from cashfree_pg.models.create_subscripton_payment_request_upi import CreateSubscriptonPaymentRequestUpi
 from typing import Union, Any, List, TYPE_CHECKING
-from pydantic import StrictStr, Field
+from pydantic import StrictStr
 
 CREATESUBSCRIPTIONPAYMENTREQUESTPAYMENTMETHOD_ONE_OF_SCHEMAS = ["CreateSubscriptionPaymentRequestCard", "CreateSubscriptionPaymentRequestEnack", "CreateSubscriptionPaymentRequestPnach", "CreateSubscriptonPaymentRequestUpi"]
 
@@ -45,11 +45,9 @@ class CreateSubscriptionPaymentRequestPaymentMethod(BaseModel):
     if TYPE_CHECKING:
         actual_instance: Union[CreateSubscriptionPaymentRequestCard, CreateSubscriptionPaymentRequestEnack, CreateSubscriptionPaymentRequestPnach, CreateSubscriptonPaymentRequestUpi]
     else:
-        actual_instance: Any
-    one_of_schemas: List[str] = Field(CREATESUBSCRIPTIONPAYMENTREQUESTPAYMENTMETHOD_ONE_OF_SCHEMAS, const=True)
-
-    class Config:
-        validate_assignment = True
+        actual_instance: Any = None
+    one_of_schemas: Literal[CREATESUBSCRIPTIONPAYMENTREQUESTPAYMENTMETHOD_ONE_OF_SCHEMAS] = CREATESUBSCRIPTIONPAYMENTREQUESTPAYMENTMETHOD_ONE_OF_SCHEMAS
+    model_config = ConfigDict(validate_assignment=True)
 
     def __init__(self, *args, **kwargs):
         if args:
@@ -61,7 +59,8 @@ class CreateSubscriptionPaymentRequestPaymentMethod(BaseModel):
         else:
             super().__init__(**kwargs)
 
-    @validator('actual_instance')
+    @field_validator('actual_instance')
+    @classmethod
     def actual_instance_must_validate_oneof(cls, v):
         instance = CreateSubscriptionPaymentRequestPaymentMethod.construct()
         error_messages = []

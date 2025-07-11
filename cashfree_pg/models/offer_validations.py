@@ -20,22 +20,19 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, Field, confloat, conint
+from pydantic import ConfigDict, BaseModel, Field
 from cashfree_pg.models.offer_validations_payment_method import OfferValidationsPaymentMethod
+from typing_extensions import Annotated
 
 class OfferValidations(BaseModel):
     """
     Offer validation object
     """
-    min_amount: Optional[Union[confloat(ge=1, strict=True), conint(ge=1, strict=True)]] = Field(None, description="Minimum Amount for Offer to be Applicable")
-    max_allowed: Union[confloat(ge=1, strict=True), conint(ge=1, strict=True)] = Field(..., description="Maximum Amount for Offer to be Applicable")
+    min_amount: Optional[Union[Annotated[float, Field(ge=1, strict=True)], Annotated[int, Field(ge=1, strict=True)]]] = Field(None, description="Minimum Amount for Offer to be Applicable")
+    max_allowed: Union[Annotated[float, Field(ge=1, strict=True)], Annotated[int, Field(ge=1, strict=True)]] = Field(..., description="Maximum Amount for Offer to be Applicable")
     payment_method: OfferValidationsPaymentMethod = Field(...)
     __properties = ["min_amount", "max_allowed", "payment_method"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

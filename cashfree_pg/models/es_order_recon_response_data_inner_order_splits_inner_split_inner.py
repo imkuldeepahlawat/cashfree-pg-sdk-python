@@ -20,7 +20,7 @@ import json
 
 
 from typing import Any, Dict, Optional, Union
-from pydantic import BaseModel, StrictFloat, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, StrictFloat, StrictInt, StrictStr
 
 class ESOrderReconResponseDataInnerOrderSplitsInnerSplitInner(BaseModel):
     """
@@ -30,11 +30,7 @@ class ESOrderReconResponseDataInnerOrderSplitsInnerSplitInner(BaseModel):
     percentage: Optional[Union[StrictFloat, StrictInt]] = None
     tags: Optional[Dict[str, Any]] = None
     __properties = ["merchant_vendor_id", "percentage", "tags"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

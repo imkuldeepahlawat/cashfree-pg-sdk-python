@@ -20,8 +20,9 @@ import json
 
 
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.cart_item import CartItem
+from typing_extensions import Annotated
 
 class CartDetails(BaseModel):
     """
@@ -29,13 +30,9 @@ class CartDetails(BaseModel):
     """
     shipping_charge: Optional[Union[StrictFloat, StrictInt]] = None
     cart_name: Optional[StrictStr] = Field(None, description="Name of the cart.")
-    cart_items: Optional[conlist(CartItem)] = None
+    cart_items: Optional[Annotated[List[CartItem], Field()]] = None
     __properties = ["shipping_charge", "cart_name", "cart_items"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

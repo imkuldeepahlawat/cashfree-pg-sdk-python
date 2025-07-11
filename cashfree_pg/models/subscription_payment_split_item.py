@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
 
 class SubscriptionPaymentSplitItem(BaseModel):
     """
@@ -29,11 +29,7 @@ class SubscriptionPaymentSplitItem(BaseModel):
     vendor_id: Optional[StrictStr] = Field(None, description="Vendor ID")
     percentage: Optional[Union[StrictFloat, StrictInt]] = Field(None, description="Percentage of the payment to be split to vendor")
     __properties = ["vendor_id", "percentage"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

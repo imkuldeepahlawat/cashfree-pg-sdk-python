@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, validator
+from pydantic import field_validator, ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.order_pay_data import OrderPayData
 
 class PayOrderEntity(BaseModel):
@@ -35,7 +35,8 @@ class PayOrderEntity(BaseModel):
     data: Optional[OrderPayData] = None
     __properties = ["payment_amount", "cf_payment_id", "payment_method", "channel", "action", "data"]
 
-    @validator('payment_method')
+    @field_validator('payment_method')
+    @classmethod
     def payment_method_validate_enum(cls, value):
         """Validates the enum"""
         if value is None:
@@ -45,7 +46,8 @@ class PayOrderEntity(BaseModel):
             raise ValueError("must be one of enum values ('netbanking', 'card', 'upi', 'app', 'cardless_emi', 'paylater', 'banktransfer')")
         return value
 
-    @validator('channel')
+    @field_validator('channel')
+    @classmethod
     def channel_validate_enum(cls, value):
         """Validates the enum"""
         if value is None:
@@ -55,7 +57,8 @@ class PayOrderEntity(BaseModel):
             raise ValueError("must be one of enum values ('link', 'collect', 'qrcode', 'post')")
         return value
 
-    @validator('action')
+    @field_validator('action')
+    @classmethod
     def action_validate_enum(cls, value):
         """Validates the enum"""
         if value is None:
@@ -64,11 +67,7 @@ class PayOrderEntity(BaseModel):
         if value not in ('link', 'custom', 'form', 'post'):
             raise ValueError("must be one of enum values ('link', 'custom', 'form', 'post')")
         return value
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

@@ -20,7 +20,7 @@ import json
 
 
 
-from pydantic import BaseModel, Field, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictStr
 
 class UploadTerminalDocs(BaseModel):
     """
@@ -30,11 +30,7 @@ class UploadTerminalDocs(BaseModel):
     doc_value: StrictStr = Field(..., description="Enter the display name of the uploaded file.")
     file: StrictStr = Field(..., description="Select the document that should be uploaded or provide the path of that file. You cannot upload a file that is more than 2MB in size.")
     __properties = ["doc_type", "doc_value", "file"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

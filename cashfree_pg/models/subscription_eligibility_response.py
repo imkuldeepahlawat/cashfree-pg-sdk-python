@@ -20,20 +20,17 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, Field, conlist
+from pydantic import ConfigDict, BaseModel, Field
 from cashfree_pg.models.eligibility_method_item import EligibilityMethodItem
+from typing_extensions import Annotated
 
 class SubscriptionEligibilityResponse(BaseModel):
     """
     Subscrition eligibility API response
     """
-    type: Optional[conlist(EligibilityMethodItem)] = Field(None, description="List of eligibile payment methods for the subscription.")
+    type: Optional[Annotated[List[EligibilityMethodItem], Field()]] = Field(None, description="List of eligibile payment methods for the subscription.")
     __properties = ["type"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

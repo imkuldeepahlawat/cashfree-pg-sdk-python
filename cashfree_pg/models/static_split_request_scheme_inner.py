@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictStr
 
 class StaticSplitRequestSchemeInner(BaseModel):
     """
@@ -29,11 +29,7 @@ class StaticSplitRequestSchemeInner(BaseModel):
     merchant_vendor_id: Optional[StrictStr] = Field(None, alias="merchantVendorId", description="Specify the merchant vendor ID to create the split scheme for the payment.")
     percentage: Optional[StrictStr] = Field(None, description="Specify the percentage of amount to be split.")
     __properties = ["merchantVendorId", "percentage"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

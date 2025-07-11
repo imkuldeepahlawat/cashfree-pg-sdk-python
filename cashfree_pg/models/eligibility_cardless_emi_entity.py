@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, StrictBool, StrictStr
+from pydantic import ConfigDict, BaseModel, StrictBool, StrictStr
 from cashfree_pg.models.cardless_emi_entity import CardlessEMIEntity
 
 class EligibilityCardlessEMIEntity(BaseModel):
@@ -32,11 +32,7 @@ class EligibilityCardlessEMIEntity(BaseModel):
     entity_value: Optional[StrictStr] = None
     entity_details: Optional[CardlessEMIEntity] = None
     __properties = ["eligibility", "entity_type", "entity_value", "entity_details"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

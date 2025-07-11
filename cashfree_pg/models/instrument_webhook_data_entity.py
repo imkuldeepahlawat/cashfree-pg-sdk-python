@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import ConfigDict, BaseModel
 from cashfree_pg.models.instrument_entity import InstrumentEntity
 
 class InstrumentWebhookDataEntity(BaseModel):
@@ -29,11 +29,7 @@ class InstrumentWebhookDataEntity(BaseModel):
     """
     instrument: Optional[InstrumentEntity] = None
     __properties = ["instrument"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

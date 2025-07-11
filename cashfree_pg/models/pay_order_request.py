@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictBool, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictBool, StrictStr
 from cashfree_pg.models.pay_order_request_payment_method import PayOrderRequestPaymentMethod
 
 class PayOrderRequest(BaseModel):
@@ -32,11 +32,7 @@ class PayOrderRequest(BaseModel):
     save_instrument: Optional[StrictBool] = None
     offer_id: Optional[StrictStr] = Field(None, description="This is required if any offers needs to be applied to the order.")
     __properties = ["payment_session_id", "payment_method", "save_instrument", "offer_id"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

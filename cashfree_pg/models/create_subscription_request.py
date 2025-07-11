@@ -20,18 +20,19 @@ import json
 
 
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field, StrictStr, conlist, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictStr
 from cashfree_pg.models.create_subscription_request_authorization_details import CreateSubscriptionRequestAuthorizationDetails
 from cashfree_pg.models.create_subscription_request_plan_details import CreateSubscriptionRequestPlanDetails
 from cashfree_pg.models.create_subscription_request_subscription_meta import CreateSubscriptionRequestSubscriptionMeta
 from cashfree_pg.models.subscription_customer_details import SubscriptionCustomerDetails
 from cashfree_pg.models.subscription_payment_split_item import SubscriptionPaymentSplitItem
+from typing_extensions import Annotated
 
 class CreateSubscriptionRequest(BaseModel):
     """
     Request body to create a new subscription.
     """
-    subscription_id: constr(strict=True, max_length=250, min_length=1) = Field(..., description="A unique ID for the subscription. It can include alphanumeric characters, underscore, dot, hyphen, and space. Maximum characters allowed is 250.")
+    subscription_id: Annotated[str, StringConstraints(strict=True, max_length=250, min_length=1)] = Field(..., description="A unique ID for the subscription. It can include alphanumeric characters, underscore, dot, hyphen, and space. Maximum characters allowed is 250.")
     customer_details: SubscriptionCustomerDetails = Field(...)
     plan_details: CreateSubscriptionRequestPlanDetails = Field(...)
     authorization_details: Optional[CreateSubscriptionRequestAuthorizationDetails] = None
@@ -40,13 +41,9 @@ class CreateSubscriptionRequest(BaseModel):
     subscription_first_charge_time: Optional[StrictStr] = Field(None, description="Time at which the first charge will be made for the subscription after authorization. Applicable only for PERIODIC plans.")
     subscription_note: Optional[StrictStr] = Field(None, description="Note for the subscription.")
     subscription_tags: Optional[Dict[str, Any]] = Field(None, description="Tags for the subscription.")
-    subscription_payment_splits: Optional[conlist(SubscriptionPaymentSplitItem)] = Field(None, description="Payment splits for the subscription.")
+    subscription_payment_splits: Optional[Annotated[List[SubscriptionPaymentSplitItem], Field()]] = Field(None, description="Payment splits for the subscription.")
     __properties = ["subscription_id", "customer_details", "plan_details", "authorization_details", "subscription_meta", "subscription_expiry_time", "subscription_first_charge_time", "subscription_note", "subscription_tags", "subscription_payment_splits"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

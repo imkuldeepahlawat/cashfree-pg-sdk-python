@@ -20,7 +20,7 @@ import json
 
 
 
-from pydantic import BaseModel, Field, StrictStr, validator
+from pydantic import field_validator, ConfigDict, BaseModel, Field, StrictStr
 
 class OrderAuthenticatePaymentRequest(BaseModel):
     """
@@ -30,17 +30,14 @@ class OrderAuthenticatePaymentRequest(BaseModel):
     action: StrictStr = Field(..., description="The action for this workflow. Could be either SUBMIT_OTP or RESEND_OTP")
     __properties = ["otp", "action"]
 
-    @validator('action')
+    @field_validator('action')
+    @classmethod
     def action_validate_enum(cls, value):
         """Validates the enum"""
         if value not in ('SUBMIT_OTP', 'RESEND_OTP'):
             raise ValueError("must be one of enum values ('SUBMIT_OTP', 'RESEND_OTP')")
         return value
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

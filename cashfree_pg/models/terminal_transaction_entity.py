@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, StrictInt, StrictStr
 
 class TerminalTransactionEntity(BaseModel):
     """
@@ -33,11 +33,7 @@ class TerminalTransactionEntity(BaseModel):
     qrcode: Optional[StrictStr] = None
     timeout: Optional[StrictStr] = None
     __properties = ["cf_payment_id", "payment_amount", "payment_method", "payment_url", "qrcode", "timeout"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

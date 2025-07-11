@@ -20,10 +20,11 @@ import json
 
 
 from typing import List, Optional, Union
-from pydantic import BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.bank_details import BankDetails
 from cashfree_pg.models.kyc_details import KycDetails
 from cashfree_pg.models.upi_details import UpiDetails
+from typing_extensions import Annotated
 
 class UpdateVendorRequest(BaseModel):
     """
@@ -36,15 +37,11 @@ class UpdateVendorRequest(BaseModel):
     verify_account: Optional[StrictBool] = Field(None, description="Specify if the vendor bank account details should be verified. Possible values: true or false")
     dashboard_access: Optional[StrictBool] = Field(None, description="Update if the vendor will have dashboard access or not. Possible values are: true or false")
     schedule_option: Union[StrictFloat, StrictInt] = Field(..., description="Specify the settlement cycle to be updated. View the settlement cycle details from the \"Settlement Cycles Supported\" table. If no schedule option is configured, the settlement cycle ID \"1\" will be in effect. Select \"8\" or \"9\" if you want to schedule instant vendor settlements.")
-    bank: Optional[conlist(BankDetails)] = Field(None, description="Specify the vendor bank account details to be updated.")
-    upi: Optional[conlist(UpiDetails)] = Field(None, description="Updated beneficiary upi vpa. Alphanumeric, dot (.), hyphen (-), at sign (@), and underscore allowed (100 character limit). Note: underscore and dot (.) gets accepted before and after @, but hyphen (-) is only accepted before @ sign.")
-    kyc_details: conlist(KycDetails) = Field(..., description="Specify the kyc details that should be updated.")
+    bank: Optional[Annotated[List[BankDetails], Field()]] = Field(None, description="Specify the vendor bank account details to be updated.")
+    upi: Optional[Annotated[List[UpiDetails], Field()]] = Field(None, description="Updated beneficiary upi vpa. Alphanumeric, dot (.), hyphen (-), at sign (@), and underscore allowed (100 character limit). Note: underscore and dot (.) gets accepted before and after @, but hyphen (-) is only accepted before @ sign.")
+    kyc_details: Annotated[List[KycDetails], Field()] = Field(..., description="Specify the kyc details that should be updated.")
     __properties = ["status", "name", "email", "phone", "verify_account", "dashboard_access", "schedule_option", "bank", "upi", "kyc_details"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

@@ -20,10 +20,11 @@ import json
 
 from datetime import datetime
 from typing import Dict, List, Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr, conlist, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.order_meta import OrderMeta
 from cashfree_pg.models.payment_link_customer_details import PaymentLinkCustomerDetails
 from cashfree_pg.models.vendor_split import VendorSplit
+from typing_extensions import Annotated
 
 class PaymentLinkOrderEntity(BaseModel):
     """
@@ -40,16 +41,12 @@ class PaymentLinkOrderEntity(BaseModel):
     order_expiry_time: Optional[datetime] = None
     order_note: Optional[StrictStr] = Field(None, description="Additional note for order")
     created_at: Optional[datetime] = Field(None, description="When the order was created at cashfree's server")
-    order_splits: Optional[conlist(VendorSplit)] = None
+    order_splits: Optional[Annotated[List[VendorSplit], Field()]] = None
     customer_details: Optional[PaymentLinkCustomerDetails] = None
     order_meta: Optional[OrderMeta] = None
-    order_tags: Optional[Dict[str, constr(strict=True, max_length=255, min_length=1)]] = Field(None, description="Custom Tags in thr form of {\"key\":\"value\"} which can be passed for an order. A maximum of 10 tags can be added")
+    order_tags: Optional[Dict[str, Annotated[str, StringConstraints(strict=True, max_length=255, min_length=1)]]] = Field(None, description="Custom Tags in thr form of {\"key\":\"value\"} which can be passed for an order. A maximum of 10 tags can be added")
     __properties = ["cf_order_id", "link_id", "order_id", "entity", "order_currency", "order_amount", "order_status", "payment_session_id", "order_expiry_time", "order_note", "created_at", "order_splits", "customer_details", "order_meta", "order_tags"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

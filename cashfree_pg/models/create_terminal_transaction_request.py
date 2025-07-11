@@ -20,7 +20,8 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictBool, StrictStr, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictBool, StrictStr
+from typing_extensions import Annotated
 
 class CreateTerminalTransactionRequest(BaseModel):
     """
@@ -28,15 +29,11 @@ class CreateTerminalTransactionRequest(BaseModel):
     """
     cf_order_id: StrictStr = Field(..., description="cashfree order ID that was returned while creating an order.")
     cf_terminal_id: Optional[StrictStr] = Field(None, description="cashfree terminal id. this is a required parameter when you do not provide the terminal phone number.")
-    payment_method: constr(strict=True, max_length=100, min_length=3) = Field(..., description="mention the payment method used for the transaction. possible values - QR_CODE, LINK.")
-    terminal_phone_no: Optional[constr(strict=True, max_length=10, min_length=10)] = Field(None, description="agent mobile number assigned to the terminal. this is a required parameter when you do not provide the cf_terminal_id.")
+    payment_method: Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)] = Field(..., description="mention the payment method used for the transaction. possible values - QR_CODE, LINK.")
+    terminal_phone_no: Optional[Annotated[str, StringConstraints(strict=True, max_length=10, min_length=10)]] = Field(None, description="agent mobile number assigned to the terminal. this is a required parameter when you do not provide the cf_terminal_id.")
     add_invoice: Optional[StrictBool] = Field(None, description="make it true to have request be sent to create a Dynamic GST QR Code.")
     __properties = ["cf_order_id", "cf_terminal_id", "payment_method", "terminal_phone_no", "add_invoice"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

@@ -20,13 +20,14 @@ import json
 
 
 from typing import List, Optional
-from pydantic import BaseModel, conlist
+from pydantic import Field, ConfigDict, BaseModel
 from cashfree_pg.models.offer_entity import OfferEntity
 from cashfree_pg.models.payment_entity import PaymentEntity
 from cashfree_pg.models.payment_webhook_customer_entity import PaymentWebhookCustomerEntity
 from cashfree_pg.models.payment_webhook_error_entity import PaymentWebhookErrorEntity
 from cashfree_pg.models.payment_webhook_gateway_details_entity import PaymentWebhookGatewayDetailsEntity
 from cashfree_pg.models.payment_webhook_order_entity import PaymentWebhookOrderEntity
+from typing_extensions import Annotated
 
 class PaymentWebhookDataEntity(BaseModel):
     """
@@ -37,13 +38,9 @@ class PaymentWebhookDataEntity(BaseModel):
     customer_details: Optional[PaymentWebhookCustomerEntity] = None
     error_details: Optional[PaymentWebhookErrorEntity] = None
     payment_gateway_details: Optional[PaymentWebhookGatewayDetailsEntity] = None
-    payment_offers: Optional[conlist(OfferEntity)] = None
+    payment_offers: Optional[Annotated[List[OfferEntity], Field()]] = None
     __properties = ["order", "payment", "customer_details", "error_details", "payment_gateway_details", "payment_offers"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

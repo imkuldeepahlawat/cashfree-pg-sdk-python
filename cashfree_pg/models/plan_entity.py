@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
 
 class PlanEntity(BaseModel):
     """
@@ -38,11 +38,7 @@ class PlanEntity(BaseModel):
     plan_status: Optional[StrictStr] = Field(None, description="Status of the plan.")
     plan_type: Optional[StrictStr] = Field(None, description="Type of the plan.")
     __properties = ["plan_currency", "plan_id", "plan_interval_type", "plan_intervals", "plan_max_amount", "plan_max_cycles", "plan_name", "plan_note", "plan_recurring_amount", "plan_status", "plan_type"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

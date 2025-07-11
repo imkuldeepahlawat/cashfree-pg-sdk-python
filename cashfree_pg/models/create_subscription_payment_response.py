@@ -20,7 +20,7 @@ import json
 
 
 from typing import Any, Dict, Optional, Union
-from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
+from pydantic import ConfigDict, BaseModel, Field, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.subscription_payment_entity_failure_details import SubscriptionPaymentEntityFailureDetails
 
 class CreateSubscriptionPaymentResponse(BaseModel):
@@ -38,11 +38,7 @@ class CreateSubscriptionPaymentResponse(BaseModel):
     data: Optional[Dict[str, Any]] = Field(None, description="Contains a payload for auth app links in case of AUTH. For charge, the payload is empty.")
     payment_method: Optional[StrictStr] = Field(None, description="Payment method used for the authorization.")
     __properties = ["cf_payment_id", "failure_details", "payment_amount", "payment_id", "payment_initiated_date", "payment_status", "payment_type", "subscription_id", "data", "payment_method"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

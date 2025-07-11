@@ -20,23 +20,20 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictStr
+from typing_extensions import Annotated
 
 class ExtendedCustomerDetails(BaseModel):
     """
     Recent Customer details associated with the order.
     """
-    customer_id: Optional[constr(strict=True, max_length=50, min_length=3)] = Field(None, description="A unique identifier for the customer. Use alphanumeric values only.")
-    customer_email: Optional[constr(strict=True, max_length=100, min_length=3)] = Field(None, description="Customer email address.")
-    customer_phone: Optional[constr(strict=True, max_length=10, min_length=10)] = Field(None, description="Customer phone number.")
-    customer_name: Optional[constr(strict=True, max_length=100, min_length=3)] = Field(None, description="Name of the customer.")
+    customer_id: Optional[Annotated[str, StringConstraints(strict=True, max_length=50, min_length=3)]] = Field(None, description="A unique identifier for the customer. Use alphanumeric values only.")
+    customer_email: Optional[Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)]] = Field(None, description="Customer email address.")
+    customer_phone: Optional[Annotated[str, StringConstraints(strict=True, max_length=10, min_length=10)]] = Field(None, description="Customer phone number.")
+    customer_name: Optional[Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)]] = Field(None, description="Name of the customer.")
     customer_uid: Optional[StrictStr] = Field(None, description="Customer identifier at Cashfree. You will get this when you create/get customer      ")
     __properties = ["customer_id", "customer_email", "customer_phone", "customer_name", "customer_uid"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

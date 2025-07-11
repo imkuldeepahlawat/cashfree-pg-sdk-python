@@ -20,11 +20,12 @@ import json
 
 
 from typing import Dict, List, Optional, Union
-from pydantic import BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr, conlist
+from pydantic import ConfigDict, BaseModel, Field, StrictBool, StrictFloat, StrictInt, StrictStr
 from cashfree_pg.models.link_customer_details_entity import LinkCustomerDetailsEntity
 from cashfree_pg.models.link_meta_response_entity import LinkMetaResponseEntity
 from cashfree_pg.models.link_notify_entity import LinkNotifyEntity
 from cashfree_pg.models.vendor_split import VendorSplit
+from typing_extensions import Annotated
 
 class LinkEntity(BaseModel):
     """
@@ -48,13 +49,9 @@ class LinkEntity(BaseModel):
     link_auto_reminders: Optional[StrictBool] = None
     link_notify: Optional[LinkNotifyEntity] = None
     link_qrcode: Optional[StrictStr] = Field(None, description="Base64 encoded string for payment link. You can scan with camera to open a link in the browser to complete the payment.")
-    order_splits: Optional[conlist(VendorSplit)] = None
+    order_splits: Optional[Annotated[List[VendorSplit], Field()]] = None
     __properties = ["cf_link_id", "link_id", "link_status", "link_currency", "link_amount", "link_amount_paid", "link_partial_payments", "link_minimum_partial_amount", "link_purpose", "link_created_at", "customer_details", "link_meta", "link_url", "link_expiry_time", "link_notes", "link_auto_reminders", "link_notify", "link_qrcode", "order_splits"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

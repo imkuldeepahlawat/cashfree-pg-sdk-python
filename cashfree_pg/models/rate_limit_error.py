@@ -20,7 +20,7 @@ import json
 
 
 from typing import Optional
-from pydantic import BaseModel, Field, StrictStr, validator
+from pydantic import field_validator, ConfigDict, BaseModel, Field, StrictStr
 
 class RateLimitError(BaseModel):
     """
@@ -31,7 +31,8 @@ class RateLimitError(BaseModel):
     type: Optional[StrictStr] = Field(None, description="rate_limit_error")
     __properties = ["message", "code", "type"]
 
-    @validator('type')
+    @field_validator('type')
+    @classmethod
     def type_validate_enum(cls, value):
         """Validates the enum"""
         if value is None:
@@ -40,11 +41,7 @@ class RateLimitError(BaseModel):
         if value not in ('rate_limit_error'):
             raise ValueError("must be one of enum values ('rate_limit_error')")
         return value
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""

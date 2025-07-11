@@ -20,23 +20,20 @@ import json
 
 
 
-from pydantic import BaseModel, Field, StrictStr, constr
+from pydantic import StringConstraints, ConfigDict, BaseModel, Field, StrictStr
+from typing_extensions import Annotated
 
 class OfferMeta(BaseModel):
     """
     Offer meta details object
     """
-    offer_title: constr(strict=True, max_length=50, min_length=3) = Field(..., description="Title for the Offer.")
-    offer_description: constr(strict=True, max_length=100, min_length=3) = Field(..., description="Description for the Offer.")
-    offer_code: constr(strict=True, max_length=45, min_length=1) = Field(..., description="Unique identifier for the Offer.")
-    offer_start_time: constr(strict=True, max_length=20, min_length=3) = Field(..., description="Start Time for the Offer")
+    offer_title: Annotated[str, StringConstraints(strict=True, max_length=50, min_length=3)] = Field(..., description="Title for the Offer.")
+    offer_description: Annotated[str, StringConstraints(strict=True, max_length=100, min_length=3)] = Field(..., description="Description for the Offer.")
+    offer_code: Annotated[str, StringConstraints(strict=True, max_length=45, min_length=1)] = Field(..., description="Unique identifier for the Offer.")
+    offer_start_time: Annotated[str, StringConstraints(strict=True, max_length=20, min_length=3)] = Field(..., description="Start Time for the Offer")
     offer_end_time: StrictStr = Field(..., description="Expiry Time for the Offer")
     __properties = ["offer_title", "offer_description", "offer_code", "offer_start_time", "offer_end_time"]
-
-    class Config:
-        """Pydantic configuration"""
-        allow_population_by_field_name = True
-        validate_assignment = True
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True)
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
