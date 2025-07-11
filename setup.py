@@ -30,7 +30,7 @@ REQUIRES = [
     "urllib3 >= 1.25.3, < 2.1.0",
     "python-dateutil",
     "sentry-sdk >= 1.32.0, < 1.33.0",
-    "pydantic >= 1.10.5, < 2",
+    "pydantic >= 2.0.0",
     "aenum"
 ]
 
